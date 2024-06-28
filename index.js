@@ -208,6 +208,7 @@
 
     _loop()
     console.log('mounted')
+    console.error('sync test')
   }
 
   function stopAutoClicker() {
