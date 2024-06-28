@@ -12,9 +12,6 @@
 ;(function () {
   'use strict'
 
-  let forceStop = false
-  let overrideMinGas = false
-
   const windowReloadIntervalMs = 30 * 1000
   const minGas = 4000
   const numberOfFingersRange = [2, 5]
@@ -25,6 +22,11 @@
   const delayBetweenMiniGameClicksRange = [350, 500]
   const delayBetweenTapsRange = [25, 35]
 
+  const state = {
+    forceStop: false,
+    overrideMinGas: false,
+  }
+
   const currentScoreSelector =
     '#app > section > div:nth-child(2) > div.home-section__wrapper > div:nth-child(1) > p'
 
@@ -34,12 +36,25 @@
   const shitCoinSelector =
     '#app > section > div:nth-child(2) > div.coin-wrapper > div.coin-container > div.coin-shit'
 
+  function reloadPageSafe() {
+    saveState()
+    location.reload()
+  }
+
   function localStorageSet(key, value) {
     localStorage.setItem(key, JSON.stringify(value))
   }
 
   function localStorageGet(key) {
     return JSON.parse(localStorage.getItem(key))
+  }
+
+  function getState() {
+    state.overrideMinGas = localStorageGet('_acOverrideMinGas') || false
+  }
+
+  function saveState() {
+    localStorageSet('_acOverrideMinGas', state.overrideMinGas)
   }
 
   function gaussianRandom(mean, stddev) {
@@ -140,8 +155,6 @@
   }
 
   async function loop() {
-    overrideMinGas = localStorageGet('_acOverrideMinGas')
-
     if (Math.random() < 0.1) {
       await sleepRand(...rareExtraDelayBetweenLoopsRange)
     }
@@ -172,10 +185,12 @@
     if (score == 0) return
 
     const gas = getAvailableGas()
-    if (gas <= 0) overrideMinGas = false
-    if (gas >= minGas) overrideMinGas = true
-    localStorageSet('_acOverrideMinGas', overrideMinGas)
-    if (gas <= minGas && !overrideMinGas) return
+    if (gas <= 0) state.overrideMinGas = false
+    if (gas >= minGas) state.overrideMinGas = true
+
+    saveState()
+
+    if (gas <= minGas && !state.overrideMinGas) return
 
     const element = document.querySelector(shitCoinSelector)
     if (!element) return
@@ -193,17 +208,22 @@
   }
 
   async function startAutoClicker() {
-    forceStop = false
+    state.forceStop = false
 
     async function _loop() {
-      if (forceStop) return
+      try {
+        if (state.forceStop) return
 
-      await loop()
+        await loop()
 
-      setTimeout(
-        _loop,
-        delayBetweenLoops + getRandomInRange(...delayBetweenLoopsOffsetRange)
-      )
+        setTimeout(
+          _loop,
+          delayBetweenLoops + getRandomInRange(...delayBetweenLoopsOffsetRange)
+        )
+      } catch (e) {
+        console.error('Error in loop', e)
+        state.forceStop = true
+      }
     }
 
     _loop()
@@ -212,14 +232,16 @@
   }
 
   function stopAutoClicker() {
-    forceStop = true
+    state.forceStop = true
+    saveState()
   }
 
-  setTimeout(startAutoClicker, 1000)
+  setTimeout(() => {
+    getState()
+    startAutoClicker()
+  }, 1000)
 
-  setTimeout(function () {
-    location.reload()
-  }, windowReloadIntervalMs)
+  setTimeout(reloadPageSafe, windowReloadIntervalMs)
 
   window.activeWebSockets = []
 
