@@ -1,5 +1,5 @@
 ;(function () {
-  window.smauc = window.smauc = window.smauc || {}
+  window.smauc = window.smauc || {}
 
   window.smauc.dom = {
     getElementCenter(element) {
