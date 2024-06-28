@@ -23,8 +23,8 @@
       const stddevX = (width / 6) * spread
       const stddevY = (height / 6) * spread
 
-      let x = window.smauc.gaussianDistribution(meanX, stddevX)
-      let y = window.smauc.gaussianDistribution(meanY, stddevY)
+      let x = window.smauc.rand.gaussianDistribution(meanX, stddevX)
+      let y = window.smauc.rand.gaussianDistribution(meanY, stddevY)
 
       x = Math.max(0, Math.min(width, x))
       y = Math.max(0, Math.min(height, y))

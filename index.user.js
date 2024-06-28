@@ -62,89 +62,6 @@
     localStorageSet('_acOverrideMinGas', state.overrideMinGas)
   }
 
-  function gaussianRandom(mean, stddev) {
-    let u = 0
-    let v = 0
-
-    while (u === 0) u = Math.random()
-    while (v === 0) v = Math.random()
-
-    let num = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v)
-    return num * stddev + mean
-  }
-
-  function getRandomInRange(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min
-  }
-
-  async function sleep(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms))
-  }
-
-  async function sleepRand(min, max) {
-    return sleep(getRandomInRange(min, max))
-  }
-
-  function createClickEvent(x, y) {
-    const clickEvent = new MouseEvent('click', {
-      view: window,
-      bubbles: true,
-      cancelable: true,
-      clientX: x,
-      clientY: y,
-    })
-
-    document.elementFromPoint(x, y).dispatchEvent(clickEvent)
-  }
-
-  function createTouchEvent(type, x, y) {
-    const touchObj = new Touch({
-      identifier: Date.now(),
-      target: document.elementFromPoint(x, y),
-      clientX: x,
-      clientY: y,
-      radiusX: 1,
-      radiusY: 1,
-      force: 1,
-    })
-
-    const touchEvent = new TouchEvent(type, {
-      cancelable: true,
-      bubbles: true,
-      touches: type === 'touchend' ? [] : [touchObj],
-      targetTouches: type === 'touchend' ? [] : [touchObj],
-      changedTouches: [touchObj],
-    })
-
-    document.elementFromPoint(x, y).dispatchEvent(touchEvent)
-  }
-
-  function getElementCoordinates(element) {
-    const rect = element.getBoundingClientRect()
-    return {
-      x: rect.left + rect.width / 2,
-      y: rect.top + rect.height / 2,
-    }
-  }
-
-  function getElementCoordinatesRandom(element, bias = 0.5) {
-    const { left, top, width, height } = element.getBoundingClientRect()
-
-    let meanX = width / 2
-    let meanY = height / 2
-
-    let stddevX = (width / 6) * bias
-    let stddevY = (height / 6) * bias
-
-    let x = gaussianRandom(meanX, stddevX)
-    let y = gaussianRandom(meanY, stddevY)
-
-    x = Math.max(0, Math.min(width, x))
-    y = Math.max(0, Math.min(height, y))
-
-    return { x: x + left, y: y + top }
-  }
-
   function getCurrentScore() {
     const score = document.querySelector(currentScoreSelector)
     if (!score) return 0
@@ -161,7 +78,7 @@
 
   async function loop() {
     if (Math.random() < 0.1) {
-      await sleepRand(...rareExtraDelayBetweenLoopsRange)
+      await window.smauc.utils.sleepRange(...rareExtraDelayBetweenLoopsRange)
     }
 
     const miniCoins = document.querySelectorAll('div.game-coin')
@@ -177,10 +94,10 @@
       }
 
       for (const coin of realCoins) {
-        await sleepRand(...delayBetweenMiniGameClicksRange)
+        await window.smauc.utils.sleepRange(...delayBetweenMiniGameClicksRange)
 
-        const coordinates = getElementCoordinatesRandom(coin)
-        createClickEvent(coordinates.x, coordinates.y)
+        const coordinates = window.smauc.dom.getElementCenterRand(coin)
+        window.smauc.dom.createClickEvent(coordinates.x, coordinates.y)
       }
 
       return
@@ -200,15 +117,23 @@
     const element = document.querySelector(shitCoinSelector)
     if (!element) return
 
-    const times = getRandomInRange(...numberOfFingersRange)
-    const coordinates = getElementCoordinatesRandom(element)
+    const times = window.smauc.rand.range(...numberOfFingersRange)
+    const coordinates = window.smauc.dom.getElementCenterRand(element)
 
     for (let i = 0; i < times; i++) {
-      createTouchEvent('touchstart', coordinates.x, coordinates.y)
-      await sleepRand(...delayBetweenTapsRange)
+      window.smauc.dom.createTouchEvent(
+        'touchstart',
+        coordinates.x,
+        coordinates.y
+      )
+      await window.smauc.utils.sleepRange(...delayBetweenTapsRange)
 
-      createTouchEvent('touchend', coordinates.x, coordinates.y)
-      await sleepRand(...delayBetweenTapsRange)
+      window.smauc.dom.createTouchEvent(
+        'touchend',
+        coordinates.x,
+        coordinates.y
+      )
+      await window.smauc.utils.sleepRange(...delayBetweenTapsRange)
     }
   }
 
@@ -221,10 +146,10 @@
 
         await loop()
 
-        setTimeout(
-          _loop,
-          delayBetweenLoops + getRandomInRange(...delayBetweenLoopsOffsetRange)
-        )
+        const ms =
+          delayBetweenLoops +
+          window.smauc.rand.range(...delayBetweenLoopsOffsetRange)
+        setTimeout(_loop, ms)
       } catch (e) {
         console.error('Error in loop', e)
         state.forceStop = true

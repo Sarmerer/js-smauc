@@ -7,7 +7,7 @@
     },
 
     async sleepRange(min, max) {
-      return sleep(getRandomInRange(min, max))
+      return window.smauc.utils.sleep(window.smauc.rand.range(min, max))
     },
   }
 })()
