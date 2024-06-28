@@ -66,4 +66,4 @@
       document.elementFromPoint(x, y).dispatchEvent(touchEvent)
     },
   }
-})
+})()
