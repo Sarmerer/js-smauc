@@ -7,6 +7,8 @@
 // @match        https://cmonkey.vip/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=cmonkey.vip
 // @grant        none
+// @require      utils/dom.js
+// @require      utils/rand.js
 // ==/UserScript==
 
 ;(function () {
