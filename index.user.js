@@ -11,6 +11,7 @@
 // @require      https://raw.githubusercontent.com/Sarmerer/js-smauc/main/utils/dom.user.js
 // @require      https://raw.githubusercontent.com/Sarmerer/js-smauc/main/utils/rand.user.js
 // @require      https://raw.githubusercontent.com/Sarmerer/js-smauc/main/constants.user.js
+// @require      https://raw.githubusercontent.com/Sarmerer/js-smauc/main/config.user.js
 // @updateURL    https://raw.githubusercontent.com/Sarmerer/js-smauc/main/index.user.js
 // @downloadURL  https://raw.githubusercontent.com/Sarmerer/js-smauc/main/index.user.js
 // ==/UserScript==
