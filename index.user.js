@@ -18,7 +18,8 @@
   'use strict'
 
   const windowReloadIntervalMs = 30 * 1000
-  const minGas = 4000
+  const minGas = 1
+  const maxGas = 19000
   const numberOfFingersRange = [2, 5]
 
   const delayBetweenLoops = 70
@@ -107,17 +108,20 @@
     if (score == 0) return
 
     const gas = getAvailableGas()
-    if (gas <= 0) state.overrideMinGas = false
-    if (gas >= minGas) state.overrideMinGas = true
+    if (gas <= minGas) state.overrideMinGas = false
+    if (gas >= maxGas) state.overrideMinGas = true
 
     saveState()
 
-    if (gas <= minGas && !state.overrideMinGas) return
+    if (gas <= maxGas && !state.overrideMinGas) return
 
     const element = document.querySelector(shitCoinSelector)
     if (!element) return
 
-    const times = window.smauc.rand.range(...numberOfFingersRange)
+    const times = Math.min(
+      window.smauc.rand.range(...numberOfFingersRange),
+      gas - minGas
+    )
     const coordinates = window.smauc.dom.getElementCenterRand(element)
 
     for (let i = 0; i < times; i++) {
