@@ -1,7 +1,7 @@
 ;(function () {
   window.smauc = window.smauc || {}
 
-  window.smauc.constants = {
+  window.smauc.constants = Object.freeze({
     currentScoreSelector:
       '#app > section > div:nth-child(2) > div.home-section__wrapper > div:nth-child(1) > p',
 
@@ -10,5 +10,5 @@
 
     shitCoinSelector:
       '#app > section > div:nth-child(2) > div.coin-wrapper > div.coin-container > div.coin-shit',
-  }
+  })
 })()

@@ -18,16 +18,7 @@
 ;(function () {
   'use strict'
 
-  const windowReloadIntervalMs = 30 * 1000
-  const minGas = 1
-  const maxGas = 19000
-  const numberOfFingersRange = [2, 5]
-
-  const delayBetweenLoops = 70
-  const delayBetweenLoopsOffsetRange = [-30, 50]
-  const rareExtraDelayBetweenLoopsRange = [200, 350]
-  const delayBetweenMiniGameClicksRange = [350, 500]
-  const delayBetweenTapsRange = [25, 35]
+  const smauc = window.smauc
 
   const state = {
     forceStop: false,
@@ -56,18 +47,14 @@
   }
 
   function getCurrentScore() {
-    const score = document.querySelector(
-      window.smauc.constants.currentScoreSelector
-    )
+    const score = document.querySelector(smauc.constants.currentScoreSelector)
     if (!score) return 0
 
     return parseInt(score.textContent)
   }
 
   function getAvailableGas() {
-    const gasMeter = document.querySelector(
-      window.smauc.constants.energyCountSelector
-    )
+    const gasMeter = document.querySelector(smauc.constants.energyCountSelector)
     if (!gasMeter) return 0
 
     return parseInt(gasMeter.textContent) || 0
@@ -75,7 +62,9 @@
 
   async function loop() {
     if (Math.random() < 0.1) {
-      await window.smauc.utils.sleepRange(...rareExtraDelayBetweenLoopsRange)
+      await smauc.utils.sleepRange(
+        ...smauc.config.rareExtraDelayBetweenLoopsRange
+      )
     }
 
     const miniCoins = document.querySelectorAll('div.game-coin')
@@ -91,10 +80,12 @@
       }
 
       for (const coin of realCoins) {
-        await window.smauc.utils.sleepRange(...delayBetweenMiniGameClicksRange)
+        await smauc.utils.sleepRange(
+          ...smauc.config.delayBetweenMiniGameClicksRange
+        )
 
-        const coordinates = window.smauc.dom.getElementCenterRand(coin)
-        window.smauc.dom.createClickEvent(coordinates.x, coordinates.y)
+        const coordinates = smauc.dom.getElementCenterRand(coin)
+        smauc.dom.createClickEvent(coordinates.x, coordinates.y)
       }
 
       return
@@ -103,6 +94,8 @@
     const score = getCurrentScore()
     if (score == 0) return
 
+    const minGas = smauc.config.minGas
+    const maxGas = smauc.config.maxGas
     const gas = getAvailableGas()
     if (gas <= minGas) state.overrideMinGas = false
     if (gas >= maxGas) state.overrideMinGas = true
@@ -111,31 +104,21 @@
 
     if (gas <= maxGas && !state.overrideMinGas) return
 
-    const element = document.querySelector(
-      window.smauc.constants.shitCoinSelector
-    )
+    const element = document.querySelector(smauc.constants.shitCoinSelector)
     if (!element) return
 
     const times = Math.min(
-      window.smauc.rand.range(...numberOfFingersRange),
+      smauc.rand.range(...smauc.config.numberOfFingersRange),
       gas - minGas
     )
-    const coordinates = window.smauc.dom.getElementCenterRand(element)
+    const coordinates = smauc.dom.getElementCenterRand(element)
 
     for (let i = 0; i < times; i++) {
-      window.smauc.dom.createTouchEvent(
-        'touchstart',
-        coordinates.x,
-        coordinates.y
-      )
-      await window.smauc.utils.sleepRange(...delayBetweenTapsRange)
+      smauc.dom.createTouchEvent('touchstart', coordinates.x, coordinates.y)
+      await smauc.utils.sleepRange(...smauc.config.delayBetweenTapsRange)
 
-      window.smauc.dom.createTouchEvent(
-        'touchend',
-        coordinates.x,
-        coordinates.y
-      )
-      await window.smauc.utils.sleepRange(...delayBetweenTapsRange)
+      smauc.dom.createTouchEvent('touchend', coordinates.x, coordinates.y)
+      await smauc.utils.sleepRange(...smauc.config.delayBetweenTapsRange)
     }
   }
 
@@ -149,8 +132,8 @@
         await loop()
 
         const ms =
-          delayBetweenLoops +
-          window.smauc.rand.range(...delayBetweenLoopsOffsetRange)
+          smauc.config.delayBetweenLoops +
+          smauc.rand.range(...smauc.config.delayBetweenLoopsOffsetRange)
         setTimeout(_loop, ms)
       } catch (e) {
         console.error('Error in loop', e)
@@ -172,7 +155,7 @@
     startAutoClicker()
   }, 1000)
 
-  setTimeout(reloadPageSafe, windowReloadIntervalMs)
+  setTimeout(reloadPageSafe, smauc.config.windowReloadIntervalMs)
 
   window.activeWebSockets = []
 
