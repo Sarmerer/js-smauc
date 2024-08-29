@@ -4,7 +4,7 @@
 // @version      2024-06-25
 // @description  try to take over the world!
 // @author       You
-// @match        https://cmonkey.vip/*
+// @match        https://prodfront.shitcoin.cool/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=cmonkey.vip
 // @grant        none
 // @require      https://raw.githubusercontent.com/Sarmerer/js-smauc/main/utils/index.user.js
