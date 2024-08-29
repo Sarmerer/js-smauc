@@ -10,6 +10,7 @@
 // @require      https://raw.githubusercontent.com/Sarmerer/js-smauc/main/utils/index.user.js
 // @require      https://raw.githubusercontent.com/Sarmerer/js-smauc/main/utils/dom.user.js
 // @require      https://raw.githubusercontent.com/Sarmerer/js-smauc/main/utils/rand.user.js
+// @require      https://raw.githubusercontent.com/Sarmerer/js-smauc/main/constants.user.js
 // @updateURL    https://raw.githubusercontent.com/Sarmerer/js-smauc/main/index.user.js
 // @downloadURL  https://raw.githubusercontent.com/Sarmerer/js-smauc/main/index.user.js
 // ==/UserScript==
@@ -33,15 +34,6 @@
     overrideMinGas: false,
   }
 
-  const currentScoreSelector =
-    '#app > section > div:nth-child(2) > div.home-section__wrapper > div:nth-child(1) > p'
-
-  const energyCountSelector =
-    '#app > section > div:nth-child(2) > div.home-section__wrapper > div.energy > div > div.energy__count-div > p > span:nth-child(1)'
-
-  const shitCoinSelector =
-    '#app > section > div:nth-child(2) > div.coin-wrapper > div.coin-container > div.coin-shit'
-
   function reloadPageSafe() {
     saveState()
     location.reload()
@@ -64,14 +56,18 @@
   }
 
   function getCurrentScore() {
-    const score = document.querySelector(currentScoreSelector)
+    const score = document.querySelector(
+      window.smauc.constants.currentScoreSelector
+    )
     if (!score) return 0
 
     return parseInt(score.textContent)
   }
 
   function getAvailableGas() {
-    const gasMeter = document.querySelector(energyCountSelector)
+    const gasMeter = document.querySelector(
+      window.smauc.constants.energyCountSelector
+    )
     if (!gasMeter) return 0
 
     return parseInt(gasMeter.textContent) || 0
@@ -115,7 +111,9 @@
 
     if (gas <= maxGas && !state.overrideMinGas) return
 
-    const element = document.querySelector(shitCoinSelector)
+    const element = document.querySelector(
+      window.smauc.constants.shitCoinSelector
+    )
     if (!element) return
 
     const times = Math.min(
